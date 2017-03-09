@@ -6,7 +6,6 @@ RUN           wget -O -  https://get.acme.sh | sh
 
 RUN           mkdir /etc/nginx/tls
 COPY          tls                   /etc/nginx/tls
-COPY          html                  /usr/share/nginx
 COPY          setup-ssl.sh          /setup-ssl.sh
 RUN           chmod u+x /setup-ssl.sh
 
