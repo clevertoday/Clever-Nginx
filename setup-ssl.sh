@@ -27,7 +27,7 @@ waitNginxUp() {
 
   NGINX_UP=1
   while [ $NGINX_UP != 0 ]; do
-    wget localhost &> /dev/null
+    wget --no-check-certificate localhost &> /dev/null
     NGINX_UP=$?
     sleep 1
   done
