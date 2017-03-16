@@ -19,7 +19,13 @@ runLetsEncrypt() {
 
 waitNginxUp() {
   echo "Wait for nginx to be up..."
-  sleep 10
+
+  NGINX_UP=1
+  while [ $NGINX_UP != 0 ]; do
+    wget localhost &> /dev/null
+    NGINX_UP=$?
+    sleep 1
+  done
 }
 
 echo "Building nginx config file..."
