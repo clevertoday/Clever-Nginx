@@ -3,18 +3,23 @@
 set -ex
 
 runLetsEncrypt() {
-  echo "Generating ssl certificate for $DOMAIN..."
 
-  /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
+  if [ ! -z $DOMAIN ]; then
+    echo "Generating ssl certificate for $DOMAIN..."
 
-  echo "Installing certificate in nginx..."
+    /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
 
-  /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
-      --keypath       /etc/nginx/tls/nginx.key \
-      --fullchainpath /etc/nginx/tls/nginx.crt \
-      --reloadcmd     "service nginx force-reload"
+    echo "Installing certificate in nginx..."
 
-  echo "Done !"
+    /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
+        --keypath       /etc/nginx/tls/nginx.key \
+        --fullchainpath /etc/nginx/tls/nginx.crt \
+        --reloadcmd     "service nginx force-reload"
+
+    echo "Certificate generated, yeah !"
+  else
+    echo "Empty env variable DOMAIN, skip the certificate generation"
+  fi
 }
 
 waitNginxUp() {
