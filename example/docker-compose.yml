@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+
+  proxy:
+    build: .
+    environment:
+      - INFLUXDB_GRAPHITE_ENABLED=true
+    restart: unless-stopped
+    environment:
+     - DOMAIN=clevergreg.localtunnel.me
+    ports:
+     - "80:80"
+     - "443:443"
