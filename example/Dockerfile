@@ -1,5 +1,5 @@
-FROM          software-factory.clevertoday.xyz/clever-nginx:lastest
+FROM          software-factory.clevertoday.xyz/clever-nginx:latest
 MAINTAINER    Grégoire Weber <gregoire@clevertoday.com>
 
-COPY          nginx.conf.template   /etc/nginx/nginx.conf.template
-COPY          index.html            /usr/share/nginx/
+COPY          nginx.conf  /etc/nginx/nginx.conf
+COPY          index.html  /usr/share/nginx/

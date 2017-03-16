@@ -34,6 +34,8 @@ waitNginxUp() {
 }
 
 echo "Building nginx config file..."
-envsubst '$DOMAIN' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+envsubst '$DOMAIN' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
+mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+rm -rf /etc/nginx/nginx.conf.tmp
 
 ( waitNginxUp && runLetsEncrypt ) & nginx -g 'daemon off;'

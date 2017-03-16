@@ -4,24 +4,25 @@ Nginx image that is able to create and configure an ssl certificate for the give
 
 ## How to use
 
+See folder example for a simple mplementation of clever-nginx
+
 Dockerfile example :
 
 ```
-FROM software-factory.clevertoday.xyz/clever-nginx
-COPY nginx.conf.template   /etc/nginx/nginx.conf.template
+FROM software-factory.clevertoday.xyz/clever-nginx:lastest
+COPY nginx.conf   /etc/nginx/nginx.conf
 ```
 
-nginx.conf.template example :
+nginx.conf example :
 
 ```
 server {
+  listen 443 ssl http2;
+  server_name ${DOMAIN};
 
-        listen 443 ssl http2;
-        server_name ${DOMAIN};
-
-        location /.well-known {
-            alias /usr/share/nginx/.well-known;
-        }
+  location /.well-known {
+    alias /usr/share/nginx/.well-known;
+  }
 }
 ```
 
