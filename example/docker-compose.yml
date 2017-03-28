@@ -4,11 +4,15 @@ services:
 
   proxy:
     build: .
-    environment:
-      - INFLUXDB_GRAPHITE_ENABLED=true
     restart: unless-stopped
     environment:
-     - DOMAIN=clevergreg.localtunnel.me
+     - DOMAIN=clevergreg2.localtunnel.me
     ports:
      - "80:80"
      - "443:443"
+    volumes:
+     - tls-proxy:/etc/letsencrypt
+
+volumes:
+  tls-proxy:
+    driver: local
