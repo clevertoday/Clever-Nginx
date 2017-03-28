@@ -5,18 +5,50 @@ set -ex
 runLetsEncrypt() {
 
   if [ ! -z $DOMAIN ]; then
+
+    echo "Checking for previously generated certificate..."
+    if [ -d "/etc/letsencrypt/$DOMAIN" ] && [ -d "/etc/letsencrypt/tls" ]; then
+      echo "Copying data from /etc/letsencrypt..."
+      cp -rP /etc/letsencrypt/tls /etc/nginx/.
+      cp -rP /etc/letsencrypt/$DOMAIN /root/.acme.sh/.
+    fi
+
     echo "Generating ssl certificate for $DOMAIN..."
 
-    /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
+    {
+      /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
+      GENERATION_RESULT=$?
+    } || {
+      GENERATION_RESULT=$?
+    }
 
-    echo "Installing certificate in nginx..."
+    if [ $GENERATION_RESULT -eq 0 ]; then
 
-    /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
+      echo "Installing certificate in nginx..."
+      /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
         --keypath       /etc/nginx/tls/nginx.key \
         --fullchainpath /etc/nginx/tls/nginx.crt \
         --reloadcmd     "service nginx force-reload"
+      echo "Certificate generated, yeah !"
 
-    echo "Certificate generated, yeah !"
+      echo "Saving data on volume"
+      cp -rP /etc/nginx/tls /etc/letsencrypt/.
+      cp -rP /root/.acme.sh/$DOMAIN /etc/letsencrypt/.
+      echo "Certificate data saved to /etc/letsencrypt/ !"
+
+    elif [ $GENERATION_RESULT -eq 2 ]; then
+
+      echo "Certificate already generated"
+      echo "Check that the crontab to renew certificate is here"
+      CRONTAB_LIST=`crontab -l`
+      if [ ! grep -q "/root/.acme.sh" $CRONTAB_LIST]; then
+        echo "Adding cronjob in crontab to renew certificate..."
+        crontab -l | { cat; echo "45 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null"; } | crontab -
+      else
+        echo "cron job already there !"
+      fi
+      
+    fi
   else
     echo "Empty env variable DOMAIN, skip the certificate generation"
   fi
