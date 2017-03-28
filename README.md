@@ -13,6 +13,12 @@ FROM software-factory.clevertoday.xyz/clever-nginx:lastest
 COPY nginx.conf   /etc/nginx/nginx.conf
 ```
 
+Add a volume to docker-compose to avoid certificate generation on startup
+```
+volumes:
+  - volume-name:/etc/letsencrypt
+```
+
 nginx.conf example :
 
 ```
