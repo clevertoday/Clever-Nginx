@@ -17,12 +17,12 @@ runLetsEncrypt() {
 
     {
       /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
-      GENERATION_RESULT=$?
+      GENERATION_EXIT_CODE=0
     } || {
-      GENERATION_RESULT=$?
+      GENERATION_EXIT_CODE=$?
     }
 
-    if [ $GENERATION_RESULT -eq 0 ]; then
+    if [ $GENERATION_EXIT_CODE -eq 0 ]; then
 
       echo "Installing certificate in nginx..."
       /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
@@ -36,7 +36,7 @@ runLetsEncrypt() {
       cp -rP /root/.acme.sh/$DOMAIN /etc/letsencrypt/.
       echo "Certificate data saved to /etc/letsencrypt/ !"
 
-    elif [ $GENERATION_RESULT -eq 2 ]; then
+    elif [ $GENERATION_EXIT_CODE -eq 2 ]; then
 
       echo "Certificate already generated"
       echo "Check that the crontab to renew certificate is here"
