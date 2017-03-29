@@ -1,4 +1,4 @@
-FROM          software-factory.clevertoday.xyz/clever-nginx:latest
+FROM          test
 MAINTAINER    Grégoire Weber <gregoire@clevertoday.com>
 
 COPY          nginx.conf  /etc/nginx/nginx.conf

@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     environment:
      - DOMAIN=clevergreg2.localtunnel.me
+     - SUB_DOMAINS=test,plop
     ports:
      - "80:80"
      - "443:443"
