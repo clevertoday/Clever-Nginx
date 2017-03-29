@@ -2,12 +2,23 @@
 
 set -ex
 
+getAcmeArguments() {
+  local DOMAINS=(${SUB_DOMAINS//,/ })
+  local ARGUMENTS="-d ${DOMAIN}"
+
+  for i in "${!DOMAINS[@]}"; do
+    ARGUMENTS="${ARGUMENTS} -d ${DOMAINS[i]}.${DOMAIN}"
+  done
+
+  echo $ARGUMENTS
+}
+
 runLetsEncrypt() {
 
   if [ ! -z $DOMAIN ]; then
 
     echo "Checking for previously generated certificate..."
-    if [ -d "/etc/letsencrypt/$DOMAIN" ] && [ -d "/etc/letsencrypt/tls" ]; then
+    if [ -d "/etc/letsencrypt/${DOMAIN}" ] && [ -d "/etc/letsencrypt/tls" ]; then
       echo "Copying data from /etc/letsencrypt..."
       cp -rP /etc/letsencrypt/tls /etc/nginx/.
       cp -rP /etc/letsencrypt/$DOMAIN /root/.acme.sh/.
@@ -16,7 +27,8 @@ runLetsEncrypt() {
     echo "Generating ssl certificate for $DOMAIN..."
 
     {
-      /root/.acme.sh/acme.sh --issue --debug -d $DOMAIN -w /usr/share/nginx/
+      ARGS=$(getAcmeArguments)
+      /root/.acme.sh/acme.sh --issue --debug ${ARGS} -w /usr/share/nginx/
       GENERATION_EXIT_CODE=0
     } || {
       GENERATION_EXIT_CODE=$?

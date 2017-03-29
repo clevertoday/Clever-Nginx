@@ -19,6 +19,14 @@ volumes:
   - volume-name:/etc/letsencrypt
 ```
 
+Give the domain and optionnaly sub domains to validate in the docker-compose
+sub domains must be comma separated, with no space
+```
+environment:
+     - DOMAIN=mydomain.com
+     - SUB_DOMAINS=www,plop,other
+```
+
 nginx.conf example :
 
 ```
