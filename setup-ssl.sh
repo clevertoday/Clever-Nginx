@@ -17,21 +17,32 @@ getAcmeArguments() {
   echo $ARGUMENTS
 }
 
+getDomain() {
+  if [ $SKIP_DOMAIN_VALIDATION = true ]; then
+    local DOMAINS=(${SUB_DOMAINS//,/ })
+    echo "${DOMAINS[0]}.${DOMAIN}"
+  else
+    echo ${DOMAIN}
+  fi
+}
+
 runLetsEncrypt() {
 
   if [ ! -z $DOMAIN ]; then
 
+    local MAIN_DOMAIN=$(getDomain)  
+
     echo "Checking for previously generated certificate..."
     
-    if [ -d "/etc/letsencrypt/${DOMAIN}" ] && [ -d "/etc/letsencrypt/tls" ]; then
+    if [ -d "/etc/letsencrypt/${MAIN_DOMAIN}" ] && [ -d "/etc/letsencrypt/tls" ]; then
     
       echo "Copying data from /etc/letsencrypt..."
       cp -rP /etc/letsencrypt/tls /etc/nginx/.
-      cp -rP /etc/letsencrypt/$DOMAIN /root/.acme.sh/.
+      cp -rP /etc/letsencrypt/$MAIN_DOMAIN /root/.acme.sh/.
     
     fi
 
-    echo "Generating ssl certificate for $DOMAIN..."
+    echo "Generating ssl certificate for $MAIN_DOMAIN..."
 
     {
       ARGS=$(getAcmeArguments)
@@ -46,18 +57,18 @@ runLetsEncrypt() {
       echo "Installing certificate in nginx..."
       cp /etc/nginx/tls/nginx.crt /etc/nginx/tls/nginx.crt.bak
       cp /etc/nginx/tls/nginx.key /etc/nginx/tls/nginx.key.bak
-      /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
+      /root/.acme.sh/acme.sh --install-cert -d $MAIN_DOMAIN \
         --keypath       /etc/nginx/tls/nginx.key \
         --fullchainpath /etc/nginx/tls/nginx.crt \
         --reloadcmd     "service nginx force-reload"
 
-      if [ -f "/root/.acme.sh/${DOMAIN}/fullchain.cer" ]; then
+      if [ -f "/root/.acme.sh/${MAIN_DOMAIN}/fullchain.cer" ]; then
         rm /etc/nginx/tls/nginx.crt.bak
         rm /etc/nginx/tls/nginx.key.bak
         
         echo "Saving data on volume"
         cp -rP /etc/nginx/tls /etc/letsencrypt/.
-        cp -rP /root/.acme.sh/$DOMAIN /etc/letsencrypt/.
+        cp -rP /root/.acme.sh/$MAIN_DOMAIN /etc/letsencrypt/.
         echo "Certificate data saved to /etc/letsencrypt/ !"
         
         echo "-------------------------------------------"
