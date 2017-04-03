@@ -18,10 +18,13 @@ runLetsEncrypt() {
   if [ ! -z $DOMAIN ]; then
 
     echo "Checking for previously generated certificate..."
+    
     if [ -d "/etc/letsencrypt/${DOMAIN}" ] && [ -d "/etc/letsencrypt/tls" ]; then
+    
       echo "Copying data from /etc/letsencrypt..."
       cp -rP /etc/letsencrypt/tls /etc/nginx/.
       cp -rP /etc/letsencrypt/$DOMAIN /root/.acme.sh/.
+    
     fi
 
     echo "Generating ssl certificate for $DOMAIN..."
@@ -37,16 +40,32 @@ runLetsEncrypt() {
     if [ $GENERATION_EXIT_CODE -eq 0 ]; then
 
       echo "Installing certificate in nginx..."
+      cp /etc/nginx/tls/nginx.crt /etc/nginx/tls/nginx.crt.bak
+      cp /etc/nginx/tls/nginx.key /etc/nginx/tls/nginx.key.bak
       /root/.acme.sh/acme.sh --install-cert -d $DOMAIN \
         --keypath       /etc/nginx/tls/nginx.key \
         --fullchainpath /etc/nginx/tls/nginx.crt \
         --reloadcmd     "service nginx force-reload"
-      echo "Certificate generated, yeah !"
 
-      echo "Saving data on volume"
-      cp -rP /etc/nginx/tls /etc/letsencrypt/.
-      cp -rP /root/.acme.sh/$DOMAIN /etc/letsencrypt/.
-      echo "Certificate data saved to /etc/letsencrypt/ !"
+      if [ -f "/root/.acme.sh/${DOMAIN}/fullchain.cer" ]; then
+        rm /etc/nginx/tls/nginx.crt.bak
+        rm /etc/nginx/tls/nginx.key.bak
+        
+        echo "Saving data on volume"
+        cp -rP /etc/nginx/tls /etc/letsencrypt/.
+        cp -rP /root/.acme.sh/$DOMAIN /etc/letsencrypt/.
+        echo "Certificate data saved to /etc/letsencrypt/ !"
+        
+        echo "-------------------------------------------"
+        echo "Certificate generated and installed, yeah !"
+        echo "-------------------------------------------"
+      else
+        mv /etc/nginx/tls/nginx.crt.bak /etc/nginx/tls/nginx.crt
+        mv /etc/nginx/tls/nginx.key.bak /etc/nginx/tls/nginx.key
+        echo "-------------------------------------"
+        echo "Error during certificate installation"
+        echo "-------------------------------------"
+      fi  
 
     elif [ $GENERATION_EXIT_CODE -eq 2 ]; then
 
