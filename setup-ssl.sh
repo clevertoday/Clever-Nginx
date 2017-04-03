@@ -6,6 +6,10 @@ getAcmeArguments() {
   local DOMAINS=(${SUB_DOMAINS//,/ })
   local ARGUMENTS="-d ${DOMAIN}"
 
+  if [ $SKIP_DOMAIN_VALIDATION = true ]; then
+    ARGUMENTS=""
+  fi
+
   for i in "${!DOMAINS[@]}"; do
     ARGUMENTS="${ARGUMENTS} -d ${DOMAINS[i]}.${DOMAIN}"
   done
