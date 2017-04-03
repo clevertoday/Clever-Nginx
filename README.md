@@ -21,9 +21,11 @@ volumes:
 
 Give the domain and optionnaly sub domains to validate in the docker-compose
 sub domains must be comma separated, with no space
+SKIP_DOMAIN_VALIDATION is optionnal and MUST be used with SUB_DOMAINS. It is used to avoid the main domain validation.
 ```
 environment:
      - DOMAIN=mydomain.com
+     - SKIP_DOMAIN_VALIDATION=true
      - SUB_DOMAINS=www,plop,other
 ```
 
