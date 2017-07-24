@@ -45,3 +45,10 @@ server {
 Use the $DOMAIN environment variable everywhere you reference the domain that will be certified by let's encrypt
 
 And do not forget to add a location the the /.well-known folder so let's encrypt can verify the certificate issued on nginx startup
+
+
+## Cron to renew certificate
+
+A cronjob is configured by default in the container.
+It runs every night at 00:45 an try to renew the certificate if it was emmitted more than 60 days ago.
+Cron job logs can be found by default in ```/var/log/acme.log```
