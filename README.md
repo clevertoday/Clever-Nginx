@@ -1,6 +1,10 @@
 # Clever Nginx !
 
-Nginx image that is able to create and configure an ssl certificate for the given domain using let's encrypt and acme.sh script (https://github.com/Neilpang/acme.sh)
+Nginx image that is able to create and configure an ssl certificate for the given domain using let's encrypt and [acme.sh](https://github.com/Neilpang/acme.sh) script
+
+## On DockerHub
+
+You can pull the image directly from CleverToday's [DockerHub page](https://hub.docker.com/r/clevertodayinc/clever-nginx/)
 
 ## How to use
 
@@ -9,7 +13,7 @@ See folder example for a simple mplementation of clever-nginx
 Dockerfile example :
 
 ```
-FROM software-factory.clevertoday.xyz/clever-nginx:lastest
+FROM clevertodayinc/clever-nginx:lastest
 COPY nginx.conf   /etc/nginx/nginx.conf
 ```
 
