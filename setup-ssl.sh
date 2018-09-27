@@ -28,7 +28,11 @@ getDomain() {
 
 configureRenewCertificateCronJob() {
   echo "Preparing crontab expression to renew certificate..."
-  crontab -l | grep -v "/root/.acme.sh" | crontab - 
+  # Remove existing acme.sh entry in crontab
+  crontab -l | grep -v "/root/.acme.sh" | crontab -
+  # Add correct PATH in crontab
+  crontab -l | { echo 'PATH=/usr/sbin:/usr/bin:/bin'; } | crontab -
+  ## Add correct acme.sh entry in crontab
   crontab -l | { cat; echo "45 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" >> /var/log/acme.log 2>&1"; } | crontab -
   echo "Cron job initialized"
 }
@@ -75,10 +79,10 @@ saveDataToVolume() {
 runLetsEncrypt() {
   if [ ! -z $DOMAIN ]; then
 
-    local MAIN_DOMAIN=$(getDomain)  
+    local MAIN_DOMAIN=$(getDomain)
 
     echo "Checking for previously generated certificate..."
-    
+
     if [ -d "/etc/letsencrypt/${MAIN_DOMAIN}" ] && [ -d "/etc/letsencrypt/tls" ]; then
       echo "Copying data from /etc/letsencrypt..."
       cp -rP /etc/letsencrypt/tls /etc/nginx/.
